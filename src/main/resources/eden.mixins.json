@@ -1,0 +1,27 @@
+{
+	"required": true,
+	"package": "dev.eden.mixin",
+	"client": [
+		"GpuDeviceAccessor",
+		"GuiGraphicsExtractorAccessor",
+		"KeyMappingAccessor",
+		"AvatarRenderStateMixin",
+		"AvatarRendererMixin",
+		"LivingEntityRendererMixin",
+		"LocalPlayerTargetingMixin",
+		"LeapFrogParticleMixin",
+		"OverlayTextureMixin",
+		"ChatComponentMixin",
+		"LightmapRenderStateExtractorMixin",
+		"LightmapMixin",
+		"GameRendererFullbrightMixin",
+		"MouseHandlerZoomMixin",
+		"ClientPacketListenerRenderMixin",
+		"EntityRendererOptimizerMixin",
+		"ScreenEffectRendererMixin",
+		"FontNameReplacerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
