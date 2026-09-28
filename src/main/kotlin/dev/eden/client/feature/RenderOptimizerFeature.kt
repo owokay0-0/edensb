@@ -2,6 +2,7 @@ package dev.eden.client.feature
 
 import net.minecraft.client.Minecraft
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
@@ -24,10 +25,10 @@ object RenderOptimizerFeature {
 		if (!EdenFeatures.renderOptimizerEnabled) {
 			return false
 		}
-		return when (type) {
-			EntityType.FALLING_BLOCK -> EdenFeatures.renderOptimizerHideFallingBlocks
-			EntityType.LIGHTNING_BOLT -> EdenFeatures.renderOptimizerHideLightning
-			EntityType.EXPERIENCE_ORB -> EdenFeatures.renderOptimizerHideExperienceOrbs
+		return when (BuiltInRegistries.ENTITY_TYPE.getKey(type).path) {
+			"falling_block" -> EdenFeatures.renderOptimizerHideFallingBlocks
+			"lightning_bolt" -> EdenFeatures.renderOptimizerHideLightning
+			"experience_orb" -> EdenFeatures.renderOptimizerHideExperienceOrbs
 			else -> false
 		}
 	}

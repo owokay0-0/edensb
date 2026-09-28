@@ -18,6 +18,7 @@ public abstract class EntityRendererOptimizerMixin<T extends Entity> {
 		double cameraX,
 		double cameraY,
 		double cameraZ,
+		float partialTick,
 		CallbackInfoReturnable<Boolean> cir
 	) {
 		if (RenderOptimizerFeature.shouldHideEntity(entity)) {

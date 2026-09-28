@@ -15,6 +15,8 @@ object EdenConfig {
 		get() = FabricLoader.getInstance().configDir.resolve("eden.json")
 
 	private var data = ConfigData()
+	private var saveDeferralDepth = 0
+	private var savePending = false
 	private val entries: MutableMap<String, EntryData>
 		get() {
 			data.sanitize()
@@ -39,9 +41,26 @@ object EdenConfig {
 	}
 
 	fun save() {
+		if (saveDeferralDepth > 0) {
+			savePending = true
+			return
+		}
 		val configPath = path
 		configPath.parent?.createDirectories()
 		configPath.writeText(gson.toJson(data))
+	}
+
+	fun batchUpdate(block: () -> Unit) {
+		saveDeferralDepth++
+		try {
+			block()
+		} finally {
+			saveDeferralDepth--
+			if (saveDeferralDepth == 0 && savePending) {
+				savePending = false
+				save()
+			}
+		}
 	}
 
 	fun entry(key: String): EntryData? = entries[key]
@@ -113,6 +132,28 @@ object EdenConfig {
 		save()
 	}
 
+	fun migrateChatShortcuts() {
+		val commandEntry = entries.remove("General.Chat Command.Command")
+		val keyEntry = entries.remove("General.Chat Command.Keybind")
+		if (commandEntry == null && keyEntry == null) return
+		val command = commandEntry?.value.orEmpty()
+		val keyName = keyEntry?.keyName
+		if (data.chatShortcuts.isNullOrEmpty()) {
+			data.chatShortcuts = mutableListOf(ChatShortcutData(command, keyName))
+		}
+		save()
+	}
+
+	fun chatShortcuts(): List<ChatShortcutData> {
+		data.sanitize()
+		return data.chatShortcuts!!
+	}
+
+	fun mutableChatShortcuts(): MutableList<ChatShortcutData> {
+		data.sanitize()
+		return data.chatShortcuts!!
+	}
+
 	fun updateEntry(key: String, updater: (EntryData) -> Unit) {
 		val entry = entries.getOrPut(key) { EntryData() }
 		updater(entry)
@@ -150,6 +191,7 @@ object EdenConfig {
 	class ConfigData {
 		var entries: MutableMap<String, EntryData>? = linkedMapOf()
 		var columns: MutableMap<String, ColumnData>? = linkedMapOf()
+		var chatShortcuts: MutableList<ChatShortcutData>? = mutableListOf()
 		var autoUpdateEnabled: Boolean? = true
 		var autoUpdateNoticeShown: Boolean? = false
 
@@ -160,10 +202,18 @@ object EdenConfig {
 			if (columns == null) {
 				columns = linkedMapOf()
 			}
+			if (chatShortcuts == null) {
+				chatShortcuts = mutableListOf()
+			}
 			if (autoUpdateEnabled == null) autoUpdateEnabled = true
 			if (autoUpdateNoticeShown == null) autoUpdateNoticeShown = false
 		}
 	}
+
+	class ChatShortcutData(
+		var message: String = "",
+		var keyName: String? = null,
+	)
 
 	class EntryData {
 		var enabled: Boolean? = null

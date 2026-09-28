@@ -1,13 +1,12 @@
 package dev.eden.client
 
-import com.mojang.blaze3d.platform.InputConstants
 import dev.eden.client.feature.EdenFeatures
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import org.lwjgl.glfw.GLFW
 
 object EdenKeybinds {
 	private val pressed = HashMap<String, Boolean>()
+	private val shortcutPressed = HashMap<String, Boolean>()
 	private val moduleDefaults = mapOf(
 		"Dungeons.Etherwarp" to false,
 		"Dungeons.DungeonBreaker" to false,
@@ -22,11 +21,11 @@ object EdenKeybinds {
 
 	fun tick(client: Minecraft) {
 		val bindings = currentBindings()
-		val allowToggle = client.screen == null
+		val allowInput = client.gui.screen() == null
 		for ((moduleKey, keyName) in bindings) {
-			val down = isDown(client, keyName)
+			val down = EdenInput.isDown(keyName)
 			val id = "$moduleKey:$keyName"
-			if (allowToggle && down && pressed[id] != true) {
+			if (allowInput && down && pressed[id] != true) {
 				toggleModule(client, moduleKey)
 			}
 			pressed[id] = down
@@ -34,6 +33,32 @@ object EdenKeybinds {
 
 		val activeIds = bindings.mapTo(HashSet()) { "${it.key}:${it.value}" }
 		pressed.keys.retainAll(activeIds)
+
+		val shortcuts = EdenConfig.chatShortcuts()
+		for ((index, shortcut) in shortcuts.withIndex()) {
+			val keyName = shortcut.keyName ?: continue
+			val down = EdenInput.isDown(keyName)
+			val id = "$index:$keyName"
+			if (allowInput && down && shortcutPressed[id] != true) {
+				runChatShortcut(client, shortcut.message)
+			}
+			shortcutPressed[id] = down
+		}
+		val activeShortcutIds = shortcuts.mapIndexedNotNullTo(HashSet()) { index, shortcut ->
+			shortcut.keyName?.let { "$index:$it" }
+		}
+		shortcutPressed.keys.retainAll(activeShortcutIds)
+	}
+
+	private fun runChatShortcut(client: Minecraft, configuredMessage: String) {
+		val message = configuredMessage.trim()
+		if (message.isEmpty()) return
+		if (message.startsWith('/')) {
+			val command = message.drop(1).trim()
+			if (command.isNotEmpty()) client.connection?.sendCommand(command)
+		} else {
+			client.connection?.sendChat(message)
+		}
 	}
 
 	private fun currentBindings(): Map<String, String> {
@@ -58,15 +83,6 @@ object EdenKeybinds {
 		return bindings
 	}
 
-	private fun isDown(client: Minecraft, keyName: String): Boolean {
-		val key = runCatching { InputConstants.getKey(keyName) }.getOrNull() ?: return false
-		return when (key.type) {
-			InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(client.window, key.value)
-			InputConstants.Type.MOUSE -> GLFW.glfwGetMouseButton(client.window.handle(), key.value) == GLFW.GLFW_PRESS
-			else -> false
-		}
-	}
-
 	private fun toggleModule(client: Minecraft, moduleKey: String) {
 		val current = EdenConfig.entry(moduleKey)?.enabled ?: moduleDefaults[moduleKey] ?: false
 		val enabled = !current
@@ -85,7 +101,7 @@ object EdenKeybinds {
 			.append(Component.literal(" "))
 			.append(Component.literal(if (enabled) "enabled" else "disabled").withColor(if (enabled) ENABLED else DISABLED))
 			.append(Component.literal(".").withColor(MESSAGE_TEXT))
-		client.gui.chat.addClientSystemMessage(message)
+		client.gui.hud.chat.addClientSystemMessage(message)
 	}
 
 	fun inferKeyName(displayValue: String): String? {

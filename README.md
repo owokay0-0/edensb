@@ -1,19 +1,19 @@
 # Eden
 
-Eden is a client-only utility mod for Hypixel SkyBlock. It brings dungeon tools, customizable HUD elements, visibility options, rendering improvements, reminders, and tooltip enhancements together in one settings menu.
+Eden is a client-only utility mod for Hypixel SkyBlock. It brings dungeon tools, customizable HUD elements, visibility options, rendering improvements, and tooltip enhancements together in one settings menu.
 
 Configuration is organized into **Dungeons**, **Visuals**, and **Misc**. Options belonging to a feature are kept inside collapsible groups, and changes are written to disk automatically. There is no global “Only in SkyBlock” switch; features that require SkyBlock information simply stay inactive until that information is available.
 
 ## Requirements
 
-- Minecraft 26.1.2
-- Fabric Loader 0.19.2 or later
+- Minecraft 26.3
+- Fabric Loader 0.19.5 or later
 - Fabric API
 - Java 25 or later
 
 ## Installing Eden
 
-1. Set up Fabric Loader and Fabric API for Minecraft 26.1.2.
+1. Set up Fabric Loader and Fabric API for Minecraft 26.3.
 2. Copy the Eden jar into your Minecraft `mods` folder.
 3. Start the game using the Fabric installation.
 
@@ -21,7 +21,8 @@ Configuration is organized into **Dungeons**, **Visuals**, and **Misc**. Options
 
 - Press `Right Shift` to open Eden while no other screen is active.
 - Run `/eden` to open the configuration menu.
-- Run `/eden hudedit` to reposition HUD components.
+- Run `/eden hud` to reposition HUD components.
+- Open **Misc → Chat Shortcuts** to bind any number of commands or messages to keyboard keys and mouse buttons.
 - Expand a feature group to see its master toggle and related options.
 - Eden stores toggles, colors, keybinds, HUD placement, and other preferences in `config/eden.json`.
 
@@ -29,7 +30,7 @@ Configuration is organized into **Dungeons**, **Visuals**, and **Misc**. Options
 
 ### Dungeon Score Meter
 
-Places the current dungeon score in a movable on-screen widget. Its anchor and size can be adjusted, and it supports either a rank-based appearance or a two-color gradient with configurable rotation. Exact placement is handled through the HUD editor.
+Shows the current dungeon score as a movable, scalable number. It is white by default and its color can be changed.
 
 ### Etherwarp
 
@@ -51,6 +52,10 @@ Improves client-side Dungeon Breaker mining when latency or mining fatigue inter
 
 Marks dungeon teammates according to their detected class. Archer, Berserker, Tank, Mage, and Healer each have an individual color, and players are rendered with both filled and outlined highlighting. The feature can also be toggled with a keybind.
 
+### Shitter Alert
+
+Shows a pulsing `NOT 4/4` HUD alert when a dungeon teammate dies, disconnects, or vanishes from a previously full teammate roster. Its scale and position can be changed in the HUD editor.
+
 ## Visual Features
 
 ### Player Hider
@@ -71,12 +76,12 @@ Removes client-side darkness so the world remains clearly illuminated.
 
 ### Performance HUD
 
-Shows FPS, estimated server TPS, and average latency in a movable overlay.
+Shows FPS, estimated server TPS, and average latency as plain white text in a movable overlay.
 
 - Choose which measurements are visible
 - Horizontal and vertical layouts
-- Adjustable anchor and scale
-- Independent label and value colors
+- Simple white and tinted-white FPS and ping history graphs
+- Adjustable placement and scale
 - Precise placement in the HUD editor
 
 ### Render Optimizer
@@ -97,7 +102,7 @@ Presents active pet progress in a configurable HUD element.
 
 - Bar and circular designs, each with alternate variants
 - Optional pet item and reversible icon placement
-- Adjustable anchor, size, and HUD-editor position
+- Adjustable size and HUD-editor position
 - Rarity-based or custom color themes
 - Editable level, XP, and background colors
 - Idle, hover, level-up, and changing-value animations
@@ -105,7 +110,7 @@ Presents active pet progress in a configurable HUD element.
 
 ### Pressure Display
 
-Shows Great Sea pressure in a movable widget. The activation threshold, anchor, scale, and theme can be changed, with final placement available through the HUD editor.
+Shows Great Sea pressure in a movable widget. The activation threshold, scale, and theme can be changed, with final placement available through the HUD editor.
 
 ### Low HP Indicator
 
@@ -113,7 +118,7 @@ Adds a full-screen warning at low health. Its opacity is adjustable, and an opti
 
 ### Drill Fuel Meter
 
-Displays remaining drill fuel in a movable overlay. It includes anchor and scaling controls, Biofuel and Mithril themes, and HUD-editor positioning.
+Displays approximate remaining drill blocks as plain text in a movable and scalable overlay. The prediction can be disabled to show fuel percentage instead.
 
 ### Action Bar Cleanup
 
@@ -123,33 +128,15 @@ Removes information that is already displayed elsewhere. Pressure and drill-fuel
 
 ### Diana QoL
 
-Lets interactions pass through small obstructive blocks such as grass, flowers, and bushes during Diana-related gameplay.
+Lets interactions pass through obstructive foliage during Diana-related gameplay. Grass and ferns, flowers, and bushes can each be controlled separately.
 
 ### Golden Fish CI
 
 Permits fishing-rod use when a nearby Golden Fish would otherwise consume or block the interaction.
 
-### Leap Frog
-
-Watches an incoming fishing trail and performs one correctly timed jump shortly before the fish reaches the bobber.
-
-### Smart Term AC
-
-Queues controlled Terminator attacks while the use key is held and avoids activating on Terminators carrying Rend.
-
 ### Infinite Chat
 
 Raises stored chat history to 10,000 messages and stops automatic history clearing while enabled.
-
-### Reminder
-
-Reads the current SkyBlock calendar and displays user-defined alerts.
-
-- Five independently enabled reminder slots
-- Custom labels, calendar days, and commands
-- Individual dates and ranges, including `7, 14, 21` and `29-31`
-- Adjustable warning time and size
-- Optional clickable chat command
 
 ### Missing Enchants
 
@@ -162,10 +149,7 @@ Condenses pet-level tooltip text without removing rarity colors or level-range i
 ## Commands
 
 - `/eden` — open the Eden configuration screen.
-- `/eden hudedit` — launch the HUD positioning editor.
+- `/eden hud` — launch the HUD positioning editor.
 - `/eden auto` — report whether automatic updates are enabled.
 - `/eden auto on` — enable automatic update checks and downloads.
 - `/eden auto off` — disable automatic updates.
-- `/eden reminder` — show the Reminder feature state.
-- `/eden reminder status` — display Reminder status details.
-- `/eden reminder test` — trigger a sample Reminder notification.

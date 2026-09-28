@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.SwingAnimation
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.AirBlock
 import net.minecraft.world.level.block.BubbleColumnBlock
@@ -34,7 +35,7 @@ import net.minecraft.world.level.block.MushroomBlock
 import net.minecraft.world.level.block.NetherPortalBlock
 import net.minecraft.world.level.block.NetherWartBlock
 import net.minecraft.world.level.block.RailBlock
-import net.minecraft.world.level.block.RedStoneWireBlock
+import net.minecraft.world.level.block.RedstoneWireBlock
 import net.minecraft.world.level.block.RedstoneTorchBlock
 import net.minecraft.world.level.block.RepeaterBlock
 import net.minecraft.world.level.block.SaplingBlock
@@ -105,7 +106,7 @@ object EtherwarpFeature {
 		LeverBlock::class.java,
 		NetherWartBlock::class.java,
 		NetherPortalBlock::class.java,
-		RedStoneWireBlock::class.java,
+		RedstoneWireBlock::class.java,
 		ComparatorBlock::class.java,
 		RedstoneTorchBlock::class.java,
 		RepeaterBlock::class.java,
@@ -125,7 +126,7 @@ object EtherwarpFeature {
 
 	private fun handleLeftClick(client: Minecraft, stack: ItemStack, clickCount: Int): Boolean {
 		val leftClickMode = EdenFeatures.etherwarpLeftClickMode
-		if (!EdenFeatures.etherwarpEnabled || leftClickMode == LEFT_CLICK_NONE || client.screen != null) {
+		if (!EdenFeatures.etherwarpEnabled || leftClickMode == LEFT_CLICK_NONE || client.gui.screen() != null) {
 			return false
 		}
 
@@ -170,7 +171,7 @@ object EtherwarpFeature {
 
 		ticksLeft--
 		when (ticksLeft) {
-			1 -> if (client.screen == null) {
+			1 -> if (client.gui.screen() == null) {
 				fakeRightClick(client)
 			}
 
@@ -183,7 +184,7 @@ object EtherwarpFeature {
 		KeyMapping.set(key, true)
 		KeyMapping.click(key)
 		KeyMapping.set(key, false)
-		client.player?.swing(InteractionHand.MAIN_HAND)
+		client.player?.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false)
 	}
 
 	private fun setShift(client: Minecraft, down: Boolean) {
@@ -198,7 +199,7 @@ object EtherwarpFeature {
 		}
 
 		val client = Minecraft.getInstance()
-		if (client.screen != null) {
+		if (client.gui.screen() != null) {
 			return
 		}
 
@@ -228,13 +229,13 @@ object EtherwarpFeature {
 		}
 
 		val color = if (etherPos.succeeded) EdenFeatures.etherwarpColor.argb else EdenFeatures.etherwarpFailColor.argb
-		val camera = client.gameRenderer.getMainCamera().position()
+		val camera = context.levelState().cameraRenderState.pos
 		val poseStack = context.poseStack()
 		poseStack.pushPose()
 		poseStack.translate(-camera.x, -camera.y, -camera.z)
 		EdenWorldBoxes.draw(
 			poseStack,
-			context.bufferSource(),
+			context.submitNodeCollector(),
 			box,
 			color,
 			EdenFeatures.etherwarpRenderStyle,

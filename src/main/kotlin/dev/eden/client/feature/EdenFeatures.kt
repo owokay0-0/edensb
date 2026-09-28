@@ -11,6 +11,10 @@ object EdenFeatures {
 	var dungeonPreventMiningSecrets: Boolean = true
 	var dungeonInstaMineWhenFatigue: Boolean = true
 	var teammateHighlightEnabled: Boolean = false
+	var shitterAlertEnabled: Boolean = true
+	var shitterAlertScale: Float = 0.74f
+	var shitterAlertX: Int = 0
+	var shitterAlertY: Int = 420
 	var etherwarpEnabled: Boolean = false
 	var etherwarpShowGuess: Boolean = true
 	var etherwarpShowFailed: Boolean = true
@@ -33,9 +37,10 @@ object EdenFeatures {
 	var playerSizeY: Float = 1.0f
 	var playerSizeZ: Float = 1.0f
 	var dianaQolEnabled: Boolean = false
+	var dianaIgnoreGrass: Boolean = true
+	var dianaIgnoreFlowers: Boolean = true
+	var dianaIgnoreBushes: Boolean = true
 	var goldenFishCiEnabled: Boolean = false
-	var leapFrogEnabled: Boolean = false
-	var smartTermAcEnabled: Boolean = false
 	var hitColorEnabled: Boolean = true
 	var infiniteChatEnabled: Boolean = false
 	var fullbrightEnabled: Boolean = false
@@ -43,11 +48,12 @@ object EdenFeatures {
 	var zoomIntensity: Int = 5
 	var zoomScrollable: Boolean = true
 	var performanceHudEnabled: Boolean = false
-	var performanceHudDirection: Int = 0
 	var performanceHudShowFps: Boolean = true
 	var performanceHudShowTps: Boolean = true
 	var performanceHudShowPing: Boolean = true
-	var performanceHudAnchor: Int = 0
+	var performanceHudShowFpsGraph: Boolean = true
+	var performanceHudShowTpsGraph: Boolean = true
+	var performanceHudShowPingGraph: Boolean = true
 	var performanceHudScale: Float = 1.0f
 	var performanceHudX: Int = 8
 	var performanceHudY: Int = 8
@@ -65,51 +71,29 @@ object EdenFeatures {
 	var renderOptimizerHideFireOverlay: Boolean = true
 	var nameReplaceEnabled: Boolean = false
 	var nameReplacement: String = "Eden"
-	var reminderEnabled: Boolean = true
-	var reminderWarningDuration: Int = 5
-	var reminderWarningScale: Float = 1.0f
-	var reminderChatButton: Boolean = true
 
 	var petOverlayEnabled: Boolean = true
-	var petOverlayType: Int = 0
-	var petOverlayShowItem: Boolean = false
-	var petOverlayInvert: Boolean = false
-	var petOverlayFlip: Boolean = false
-	var petOverlayAnchor: Int = 7
 	var petOverlayScale: Float = 1.0f
-	var petOverlayTheme: Int = 0
-	var petOverlayIdlePulse: Boolean = true
-	var petOverlayIdleHover: Boolean = true
-	var petOverlayLevelUpAnimation: Boolean = true
-	var petOverlayValueAnimation: Boolean = true
-	var petOverlayRainbowLevel: Boolean = false
-	var petOverlayRainbowXp: Boolean = false
-	var petOverlayRainbowBackground: Boolean = false
 	var petOverlayX: Int = 65
 	var petOverlayY: Int = -40
 
 	var pressureDisplayEnabled: Boolean = true
 	var pressureDisplayShowAt: Float = 0.05f
-	var pressureDisplayAnchor: Int = 7
 	var pressureDisplayScale: Float = 1.0f
 	var pressureDisplayTheme: Int = 0
 	var pressureDisplayX: Int = -90
 	var pressureDisplayY: Int = -55
 
 	var drillFuelMeterEnabled: Boolean = true
-	var drillFuelMeterAnchor: Int = 7
 	var drillFuelMeterScale: Float = 1.0f
-	var drillFuelMeterTheme: Int = 0
+	var drillFuelPredictionEnabled: Boolean = true
 	var drillFuelMeterX: Int = -120
 	var drillFuelMeterY: Int = -65
 
 	var dungeonScoreMeterEnabled: Boolean = true
-	var dungeonScoreMeterAnchor: Int = 7
 	var dungeonScoreMeterScale: Float = 1.0f
-	var dungeonScoreMeterTheme: Int = 0
-	var dungeonScoreMeterGradientRotation: Float = 0.9f
-	var dungeonScoreMeterX: Int = -160
-	var dungeonScoreMeterY: Int = -50
+	var dungeonScoreMeterX: Int = -336
+	var dungeonScoreMeterY: Int = -142
 
 	var lowHpIndicatorEnabled: Boolean = true
 	var lowHpIndicatorHeartbeat: Boolean = true
@@ -129,51 +113,12 @@ object EdenFeatures {
 	val mageColor = ColorState(0xFF00A2E8.toInt())
 	val healerColor = ColorState(0xFFFFAFCA.toInt())
 	val hitColor = ColorState(0xB2FF0000.toInt())
-	val performanceHudNameColor = ColorState(0xFFAAA4FF.toInt())
-	val performanceHudValueColor = ColorState(0xFFFFFFFF.toInt())
 	val nameReplaceColor = ColorState(0xFFAAA4FF.toInt())
-	val petOverlayLevelColor = ColorState(0xFFFFFFFF.toInt())
-	val petOverlayXpColor = ColorState(0xFF888888.toInt())
-	val petOverlayBackgroundColor = ColorState(0xFF333333.toInt())
-	val dungeonScoreGradientColor1 = ColorState(0xFF6F9896.toInt())
-	val dungeonScoreGradientColor2 = ColorState(0xFFA6DB83.toInt())
+	val dungeonScoreColor = ColorState(0xFFFFFFFF.toInt())
 
 	val etherwarpRenderStyles = arrayOf("Filled", "Outline", "Filled Outline")
 	val etherwarpLeftClickModes = arrayOf("Off", "Left Click", "Left Click + Shift")
-	val hudAnchors = arrayOf(
-		"Top Left",
-		"Middle Left",
-		"Bottom Left",
-		"Top Right",
-		"Middle Right",
-		"Bottom Right",
-		"Top Middle",
-		"Bottom Middle",
-	)
-	val petOverlayTypes = arrayOf("Bar", "Bar (alt)", "Circular", "Circular (alt)")
-	val petOverlayThemes = arrayOf(
-		"Pet Rarity",
-		"Custom",
-		"Special",
-		"Divine",
-		"Mythic",
-		"Legendary",
-		"Epic",
-		"Rare",
-		"Uncommon",
-		"Common",
-	)
 	val pressureThemes = arrayOf("Nighttime", "Peach")
-	val drillFuelThemes = arrayOf("Biofuel", "Mithril")
-	val dungeonScoreThemes = arrayOf("Rank", "Gradient")
-	val performanceHudDirections = arrayOf("Horizontal", "Vertical")
-	val reminderRules = mutableListOf(
-		ReminderRule(true, "Forge Reminders", "7, 14, 21, 28", "/warp forge"),
-		ReminderRule(false, "Spooky Festival", "29-31", "/calendar"),
-		ReminderRule(false, "Reminder 3", "", ""),
-		ReminderRule(false, "Reminder 4", "", ""),
-		ReminderRule(false, "Reminder 5", "", ""),
-	)
 
 	private val roleColors = mapOf(
 		'A' to archerColor,
@@ -190,6 +135,10 @@ object EdenFeatures {
 		EdenConfig.entry("Dungeons.DungeonBreaker.Prevent mining secrets")?.switchValue?.let { dungeonPreventMiningSecrets = it }
 		EdenConfig.entry("Dungeons.DungeonBreaker.Insta-mine when fatigue")?.switchValue?.let { dungeonInstaMineWhenFatigue = it }
 		EdenConfig.entry("Dungeons.Teammate Highlight")?.enabled?.let { teammateHighlightEnabled = it }
+		EdenConfig.entry("Dungeons.Shitter Alert")?.enabled?.let { shitterAlertEnabled = it }
+		shitterAlertScale = slider("Dungeons.Shitter Alert.Scale", 0.5f, 2.0f, shitterAlertScale)
+		shitterAlertX = intValue("Dungeons.Shitter Alert.Hud X", shitterAlertX)
+		shitterAlertY = intValue("Dungeons.Shitter Alert.Hud Y", shitterAlertY)
 		EdenConfig.entry("Dungeons.Etherwarp")?.enabled?.let { etherwarpEnabled = it }
 		EdenConfig.entry("Dungeons.Etherwarp.Show Guess")?.switchValue?.let { etherwarpShowGuess = it }
 		EdenConfig.entry("Dungeons.Etherwarp.Show when failed")?.switchValue?.let { etherwarpShowFailed = it }
@@ -225,9 +174,10 @@ object EdenFeatures {
 		playerSizeZ = slider("Visuals.Player Size.Z Scale", 0.1f, 3.0f, playerSizeZ)
 
 		EdenConfig.entry("Misc.Diana QoL")?.enabled?.let { dianaQolEnabled = it }
+		dianaIgnoreGrass = switch("Misc.Diana QoL.Ignore Grass", dianaIgnoreGrass)
+		dianaIgnoreFlowers = switch("Misc.Diana QoL.Ignore Flowers", dianaIgnoreFlowers)
+		dianaIgnoreBushes = switch("Misc.Diana QoL.Ignore Bushes", dianaIgnoreBushes)
 		EdenConfig.entry("Misc.Golden Fish CI")?.enabled?.let { goldenFishCiEnabled = it }
-		EdenConfig.entry("Misc.Leap Frog")?.enabled?.let { leapFrogEnabled = it }
-		EdenConfig.entry("Misc.Smart Term AC")?.enabled?.let { smartTermAcEnabled = it }
 		EdenConfig.entry("Visuals.Hit Color")?.enabled?.let { hitColorEnabled = it }
 		color("Visuals.Hit Color.Color", hitColor)
 		EdenConfig.entry("Misc.Infinite Chat")?.enabled?.let { infiniteChatEnabled = it }
@@ -236,18 +186,14 @@ object EdenFeatures {
 		zoomIntensity = slider("Visuals.Zoom.Intensity", 1.0f, 10.0f, zoomIntensity.toFloat()).roundToInt().coerceIn(1, 10)
 		zoomScrollable = switch("Visuals.Zoom.Scrollable", zoomScrollable)
 		EdenConfig.entry("Visuals.Performance HUD")?.enabled?.let { performanceHudEnabled = it }
-		performanceHudDirection = selected(
-			"Visuals.Performance HUD.Direction",
-			performanceHudDirection,
-			performanceHudDirections.lastIndex,
-		)
 		performanceHudShowFps = switch("Visuals.Performance HUD.Show FPS", performanceHudShowFps)
 		performanceHudShowTps = switch("Visuals.Performance HUD.Show TPS", performanceHudShowTps)
 		performanceHudShowPing = switch("Visuals.Performance HUD.Show Ping", performanceHudShowPing)
-		performanceHudAnchor = selected("Visuals.Performance HUD.Anchor", performanceHudAnchor, hudAnchors.lastIndex)
+		val legacyGraphs = EdenConfig.entry("Visuals.Performance HUD.Show Graphs")?.switchValue ?: true
+		performanceHudShowFpsGraph = switch("Visuals.Performance HUD.FPS Graph", legacyGraphs)
+		performanceHudShowTpsGraph = switch("Visuals.Performance HUD.TPS Graph", legacyGraphs)
+		performanceHudShowPingGraph = switch("Visuals.Performance HUD.Ping Graph", legacyGraphs)
 		performanceHudScale = slider("Visuals.Performance HUD.Scale", 0.5f, 2.0f, performanceHudScale)
-		color("Visuals.Performance HUD.Name Color", performanceHudNameColor)
-		color("Visuals.Performance HUD.Value Color", performanceHudValueColor)
 		performanceHudX = intValue("Visuals.Performance HUD.Hud X", performanceHudX)
 		performanceHudY = intValue("Visuals.Performance HUD.Hud Y", performanceHudY)
 
@@ -298,78 +244,30 @@ object EdenFeatures {
 		nameReplacement = stringValue("Visuals.Name Replace.Replacement", nameReplacement)
 		color("Visuals.Name Replace.Color", nameReplaceColor)
 
-		EdenConfig.entry("Misc.Reminder")?.enabled?.let { reminderEnabled = it }
-		reminderWarningDuration = slider(
-			"Misc.Reminder.Warning Duration",
-			1.0f,
-			30.0f,
-			reminderWarningDuration.toFloat(),
-		).roundToInt()
-		reminderWarningScale = slider(
-			"Misc.Reminder.Warning Scale",
-			0.5f,
-			2.5f,
-			reminderWarningScale,
-		)
-		reminderChatButton = switch("Misc.Reminder.Chat Command Button", reminderChatButton)
-		for ((index, rule) in reminderRules.withIndex()) {
-			val number = index + 1
-			rule.enabled = switch("Misc.Reminder.Reminder $number Enabled", rule.enabled)
-			rule.name = stringValue("Misc.Reminder.Reminder $number Name", rule.name)
-			rule.days = stringValue("Misc.Reminder.Reminder $number Days", rule.days)
-			rule.command = stringValue("Misc.Reminder.Reminder $number Command", rule.command)
-		}
 		HitColorFeature.refresh()
 		NameReplaceFeature.refresh()
 
 		EdenConfig.entry("Visuals.Pet Overlay")?.enabled?.let { petOverlayEnabled = it }
-		petOverlayType = selected("Visuals.Pet Overlay.Type", petOverlayType, petOverlayTypes.lastIndex)
-		petOverlayShowItem = switch("Visuals.Pet Overlay.Show Pet Item", petOverlayShowItem)
-		petOverlayInvert = switch("Visuals.Pet Overlay.Invert Level/XP Color", petOverlayInvert)
-		petOverlayFlip = switch("Visuals.Pet Overlay.Flip Icon Position", petOverlayFlip)
-		petOverlayAnchor = selected("Visuals.Pet Overlay.Anchor", petOverlayAnchor, hudAnchors.lastIndex)
 		petOverlayScale = slider("Visuals.Pet Overlay.Scale", 0.5f, 2.0f, petOverlayScale)
-		petOverlayTheme = selected("Visuals.Pet Overlay.Theme", petOverlayTheme, petOverlayThemes.lastIndex)
-		petOverlayIdlePulse = switch("Visuals.Pet Overlay.Idle Pulse", petOverlayIdlePulse)
-		petOverlayIdleHover = switch("Visuals.Pet Overlay.Idle Hover", petOverlayIdleHover)
-		petOverlayLevelUpAnimation = switch("Visuals.Pet Overlay.Level Up Animation", petOverlayLevelUpAnimation)
-		petOverlayValueAnimation = switch("Visuals.Pet Overlay.Level/XP Animation", petOverlayValueAnimation)
-		petOverlayRainbowLevel = switch("Visuals.Pet Overlay.Rainbow Level", petOverlayRainbowLevel)
-		petOverlayRainbowXp = switch("Visuals.Pet Overlay.Rainbow XP", petOverlayRainbowXp)
-		petOverlayRainbowBackground = switch("Visuals.Pet Overlay.Rainbow Background", petOverlayRainbowBackground)
-		color("Visuals.Pet Overlay.Level Color", petOverlayLevelColor)
-		color("Visuals.Pet Overlay.XP Color", petOverlayXpColor)
-		color("Visuals.Pet Overlay.Background Color", petOverlayBackgroundColor)
 		petOverlayX = intValue("Visuals.Pet Overlay.Hud X", petOverlayX)
 		petOverlayY = intValue("Visuals.Pet Overlay.Hud Y", petOverlayY)
 
 		EdenConfig.entry("Visuals.Pressure Display")?.enabled?.let { pressureDisplayEnabled = it }
 		pressureDisplayShowAt = slider("Visuals.Pressure Display.Show At", 0.01f, 0.99f, pressureDisplayShowAt)
-		pressureDisplayAnchor = selected("Visuals.Pressure Display.Anchor", pressureDisplayAnchor, hudAnchors.lastIndex)
 		pressureDisplayScale = slider("Visuals.Pressure Display.Scale", 0.5f, 2.0f, pressureDisplayScale)
 		pressureDisplayTheme = selected("Visuals.Pressure Display.Theme", pressureDisplayTheme, pressureThemes.lastIndex)
 		pressureDisplayX = intValue("Visuals.Pressure Display.Hud X", pressureDisplayX)
 		pressureDisplayY = intValue("Visuals.Pressure Display.Hud Y", pressureDisplayY)
 
 		EdenConfig.entry("Visuals.Drill Fuel Meter")?.enabled?.let { drillFuelMeterEnabled = it }
-		drillFuelMeterAnchor = selected("Visuals.Drill Fuel Meter.Anchor", drillFuelMeterAnchor, hudAnchors.lastIndex)
 		drillFuelMeterScale = slider("Visuals.Drill Fuel Meter.Scale", 0.5f, 2.0f, drillFuelMeterScale)
-		drillFuelMeterTheme = selected("Visuals.Drill Fuel Meter.Theme", drillFuelMeterTheme, drillFuelThemes.lastIndex)
+		drillFuelPredictionEnabled = switch("Visuals.Drill Fuel Meter.Block Prediction", drillFuelPredictionEnabled)
 		drillFuelMeterX = intValue("Visuals.Drill Fuel Meter.Hud X", drillFuelMeterX)
 		drillFuelMeterY = intValue("Visuals.Drill Fuel Meter.Hud Y", drillFuelMeterY)
 
 		EdenConfig.entry("Dungeons.Dungeon Score Meter")?.enabled?.let { dungeonScoreMeterEnabled = it }
-		dungeonScoreMeterAnchor = selected("Dungeons.Dungeon Score Meter.Anchor", dungeonScoreMeterAnchor, hudAnchors.lastIndex)
 		dungeonScoreMeterScale = slider("Dungeons.Dungeon Score Meter.Scale", 0.5f, 2.0f, dungeonScoreMeterScale)
-		dungeonScoreMeterTheme = selected("Dungeons.Dungeon Score Meter.Theme", dungeonScoreMeterTheme, dungeonScoreThemes.lastIndex)
-		dungeonScoreMeterGradientRotation = slider(
-			"Dungeons.Dungeon Score Meter.Gradient Rotation",
-			0.0f,
-			1.0f,
-			dungeonScoreMeterGradientRotation,
-		)
-		color("Dungeons.Dungeon Score Meter.Gradient 1st Color", dungeonScoreGradientColor1)
-		color("Dungeons.Dungeon Score Meter.Gradient 2nd Color", dungeonScoreGradientColor2)
+		color("Dungeons.Dungeon Score Meter.Color", dungeonScoreColor)
 		dungeonScoreMeterX = intValue("Dungeons.Dungeon Score Meter.Hud X", dungeonScoreMeterX)
 		dungeonScoreMeterY = intValue("Dungeons.Dungeon Score Meter.Hud Y", dungeonScoreMeterY)
 
@@ -487,13 +385,6 @@ object EdenFeatures {
 			}
 		}
 	}
-
-	data class ReminderRule(
-		var enabled: Boolean,
-		var name: String,
-		var days: String,
-		var command: String,
-	)
 
 	private fun rgbToHsb(r: Int, g: Int, b: Int): FloatArray {
 		val red = r / 255.0f

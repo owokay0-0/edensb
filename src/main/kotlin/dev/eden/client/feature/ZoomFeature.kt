@@ -1,11 +1,10 @@
 package dev.eden.client.feature
 
-import com.mojang.blaze3d.platform.InputConstants
 import dev.eden.client.EdenConfig
+import dev.eden.client.EdenInput
 import dev.eden.client.EdenKeybinds
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
@@ -27,7 +26,7 @@ object ZoomFeature {
 	fun isZooming(): Boolean {
 		val client = Minecraft.getInstance()
 		return EdenFeatures.zoomEnabled &&
-			client.screen == null &&
+			client.gui.screen() == null &&
 			client.isWindowActive &&
 			isZoomKeyDown(client)
 	}
@@ -74,11 +73,6 @@ object ZoomFeature {
 	private fun isZoomKeyDown(client: Minecraft): Boolean {
 		val entry = EdenConfig.entry("Visuals.Zoom.Keybind")
 		val keyName = entry?.keyName ?: EdenKeybinds.inferKeyName(entry?.value.orEmpty()) ?: DEFAULT_KEY
-		val key = runCatching { InputConstants.getKey(keyName) }.getOrNull() ?: return false
-		return when (key.type) {
-			InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(client.window, key.value)
-			InputConstants.Type.MOUSE -> GLFW.glfwGetMouseButton(client.window.handle(), key.value) == GLFW.GLFW_PRESS
-			else -> false
-		}
+		return EdenInput.isDown(keyName)
 	}
 }

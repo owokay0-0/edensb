@@ -1,11 +1,15 @@
-package com.mojang.blaze3d.opengl
+package com.mojang.renderpearl.backend.opengl
 
-import com.mojang.blaze3d.systems.GpuDevice
+import com.mojang.renderpearl.api.device.GpuDevice
+import com.mojang.renderpearl.api.textures.GpuTextureView
 import dev.eden.mixin.GpuDeviceAccessor
 
 object EdenGlBridge {
-	fun directStateAccess(device: GpuDevice): DirectStateAccess? {
+	fun framebuffer(device: GpuDevice, color: GpuTextureView, depth: GpuTextureView): Int? {
 		val backend = (device as GpuDeviceAccessor).edenBackend()
-		return if (backend is GlDevice) backend.directStateAccess() else null
+		if (backend !is GlDevice || color !is FrameBufferAttachment || depth !is FrameBufferAttachment) {
+			return null
+		}
+		return backend.frameBufferCache().getFbo(backend.directStateAccess(), listOf(color), depth)
 	}
 }

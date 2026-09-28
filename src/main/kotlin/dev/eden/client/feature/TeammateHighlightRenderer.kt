@@ -6,7 +6,7 @@ import dev.eden.client.render.EdenWorldRenderTypes
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.AABB
 import java.util.Locale
@@ -39,8 +39,8 @@ object TeammateHighlightRenderer {
 		}
 
 		val poseStack = context.poseStack()
-		val bufferSource = context.bufferSource()
-		val camera = client.gameRenderer.getMainCamera().position()
+		val submitNodeCollector = context.submitNodeCollector()
+		val camera = context.levelState().cameraRenderState.pos
 
 		poseStack.pushPose()
 		poseStack.translate(-camera.x, -camera.y, -camera.z)
@@ -52,12 +52,10 @@ object TeammateHighlightRenderer {
 			val role = roles[player.scoreboardName.lowercase(Locale.ROOT)] ?: continue
 			val color = EdenFeatures.colorForRole(role)?.argb ?: continue
 			val box = player.boundingBox.inflate(0.08, 0.08, 0.08)
-			drawFilledBox(poseStack, bufferSource, box, withAlpha(color, (((color ushr 24) and 0xFF) * 0.30f).toInt()))
-			drawLineBox(poseStack, bufferSource, box, color)
+			drawFilledBox(poseStack, submitNodeCollector, box, withAlpha(color, (((color ushr 24) and 0xFF) * 0.30f).toInt()))
+			drawLineBox(poseStack, submitNodeCollector, box, color)
 		}
 		poseStack.popPose()
-		bufferSource.endBatch(EdenWorldRenderTypes.filledEsp)
-		bufferSource.endBatch(EdenWorldRenderTypes.linesEsp)
 	}
 
 	private fun scoreboardRoles(scoreboard: net.minecraft.world.scores.Scoreboard): Map<String, Char> {
@@ -81,24 +79,24 @@ object TeammateHighlightRenderer {
 		return roles
 	}
 
-	private fun drawFilledBox(poseStack: PoseStack, bufferSource: MultiBufferSource, box: AABB, color: Int) {
-		val pose = poseStack.last()
-		val buffer = bufferSource.getBuffer(EdenWorldRenderTypes.filledEsp)
+	private fun drawFilledBox(poseStack: PoseStack, submitNodeCollector: SubmitNodeCollector, box: AABB, color: Int) {
 		val r = ((color ushr 16) and 0xFF) / 255.0f
 		val g = ((color ushr 8) and 0xFF) / 255.0f
 		val b = (color and 0xFF) / 255.0f
 		val a = ((color ushr 24) and 0xFF) / 255.0f
-		filledVertices(pose, buffer, box, r, g, b, a)
+		submitNodeCollector.submitCustomGeometry(poseStack, EdenWorldRenderTypes.filledEsp) { pose, buffer ->
+			filledVertices(pose, buffer, box, r, g, b, a)
+		}
 	}
 
-	private fun drawLineBox(poseStack: PoseStack, bufferSource: MultiBufferSource, box: AABB, color: Int) {
-		val pose = poseStack.last()
-		val buffer = bufferSource.getBuffer(EdenWorldRenderTypes.linesEsp)
+	private fun drawLineBox(poseStack: PoseStack, submitNodeCollector: SubmitNodeCollector, box: AABB, color: Int) {
 		val r = ((color ushr 16) and 0xFF) / 255.0f
 		val g = ((color ushr 8) and 0xFF) / 255.0f
 		val b = (color and 0xFF) / 255.0f
 		val a = ((color ushr 24) and 0xFF) / 255.0f
-		lineVertices(pose, buffer, box, r, g, b, a)
+		submitNodeCollector.submitCustomGeometry(poseStack, EdenWorldRenderTypes.linesEsp) { pose, buffer ->
+			lineVertices(pose, buffer, box, r, g, b, a)
+		}
 	}
 
 	private fun lineVertices(

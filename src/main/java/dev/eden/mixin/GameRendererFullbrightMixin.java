@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererFullbrightMixin {
-	@Inject(method = "getBossOverlayWorldDarkening", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "bossOverlayWorldDarkening", at = @At("RETURN"), cancellable = true)
 	private void eden$disableWorldDarkening(float tickDelta, CallbackInfoReturnable<Float> cir) {
 		if (FullbrightFeature.isActive()) {
 			cir.setReturnValue(0.0F);

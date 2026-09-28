@@ -19,6 +19,7 @@ import org.lwjgl.nanovg.NanoVG.nvgFill
 import org.lwjgl.nanovg.NanoVG.nvgFillColor
 import org.lwjgl.nanovg.NanoVG.nvgFillPaint
 import org.lwjgl.nanovg.NanoVG.nvgFontFaceId
+import org.lwjgl.nanovg.NanoVG.nvgFontBlur
 import org.lwjgl.nanovg.NanoVG.nvgFontSize
 import org.lwjgl.nanovg.NanoVG.nvgGlobalAlpha
 import org.lwjgl.nanovg.NanoVG.nvgLinearGradient
@@ -175,14 +176,16 @@ object EdenNvgRenderer {
 	fun text(text: String, x: Float, y: Float, size: Float, color: Int, font: EdenFont = defaultFont) {
 		nvgFontSize(vg, size)
 		nvgFontFaceId(vg, fontId(font))
+		nvgFontBlur(vg, 0.0f)
 		setColor(color)
 		nvgFillColor(vg, this.color)
-		nvgText(vg, x, y + 0.5f, text)
+		nvgText(vg, x, y, text)
 	}
 
 	fun textWidth(text: String, size: Float, font: EdenFont = defaultFont): Float {
 		nvgFontSize(vg, size)
 		nvgFontFaceId(vg, fontId(font))
+		nvgFontBlur(vg, 0.0f)
 		return nvgTextBounds(vg, 0.0f, 0.0f, text, fontBounds)
 	}
 

@@ -56,7 +56,15 @@ object SkyblockDataTracker {
 	private val pressurePattern = Regex("""Pressure:\s*\D*(\d+)%""", RegexOption.IGNORE_CASE)
 	private val drillFuelPattern = Regex("""([\d,]+)/([\d,.]+[kKmM]?)\s+Drill Fuel""")
 	private val dungeonScorePattern = Regex("""Cleared:\s*\d+%\s*\((\d+)\)""", RegexOption.IGNORE_CASE)
-	private val petNamePattern = Regex("""\[Lvl\s+(\d+)(?:\s*->\s*\d+)?]\s*(.+)""", RegexOption.IGNORE_CASE)
+	private val petTabWidgetPattern = Regex(
+		"""^\s*(?:Pet:\s*)?\[Lvl\s+([\d,]+)]\s+(?:\[[\d,]+✦]\s+)?([\p{L}\p{N}' -]+?)(?:\s+✦)?\s*$""",
+		RegexOption.IGNORE_CASE,
+	)
+	private val noPetSelectedPattern = Regex("""^\s*No pet selected\s*$""", RegexOption.IGNORE_CASE)
+	private val petStackNamePattern = Regex(
+		"""\[Lvl\s+([\d,]+)(?:\s*->\s*[\d,]+)?]\s*(?:\[[\d,]+✦]\s+)?(.+)""",
+		RegexOption.IGNORE_CASE,
+	)
 	private val summonPattern = Regex("""You (summoned|despawned) your (.+?)!""", RegexOption.IGNORE_CASE)
 	private val autopetPattern = Regex("""Autopet equipped your \[Lvl\s+(\d+)]\s+(.+?)!\s+VIEW RULE""", RegexOption.IGNORE_CASE)
 	private val levelUpPattern = Regex("""Your (.+?) leveled up to level (\d+)!""", RegexOption.IGNORE_CASE)
@@ -126,6 +134,13 @@ object SkyblockDataTracker {
 		pressure = 0.0f
 		dungeonScore = 0.0f
 		petActive = false
+		petName = "Pet"
+		petLevel = 1
+		petMaxLevel = 100
+		petXp = 0.0f
+		petRarity = "common"
+		petItem = null
+		petHeldItem = null
 	}
 
 	private fun readScoreboard(client: Minecraft) {
@@ -220,7 +235,7 @@ object SkyblockDataTracker {
 	}
 
 	private fun readPetMenu(client: Minecraft) {
-		val screen = client.screen as? AbstractContainerScreen<*> ?: return
+		val screen = client.gui.screen() as? AbstractContainerScreen<*> ?: return
 		if (!screen.title.string.startsWith("Pets")) {
 			return
 		}
@@ -244,19 +259,23 @@ object SkyblockDataTracker {
 	private fun readPetTab(client: Minecraft) {
 		val connection = client.connection ?: return
 		val lines = connection.onlinePlayers.mapNotNull { it.tabListDisplayName }
-		val petLine = lines.firstOrNull { petNamePattern.containsMatchIn(it.string) } ?: return
-		val match = petNamePattern.find(petLine.string) ?: return
-		val tabName = normalizePetName(match.groupValues[2])
-		if (petName != "Pet" && !tabName.contains(petName, ignoreCase = true) && !petName.contains(tabName, ignoreCase = true)) {
+		if (lines.any { noPetSelectedPattern.matches(it.string) }) {
+			petActive = false
 			return
 		}
+		val (petLine, match) = lines.firstNotNullOfOrNull { line ->
+			petTabWidgetPattern.matchEntire(line.string)?.let { line to it }
+		} ?: return
+		val tabName = normalizePetName(match.groupValues[2])
 
-		petLevel = match.groupValues[1].toIntOrNull() ?: petLevel
+		petLevel = match.groupValues[1].replace(",", "").toIntOrNull() ?: petLevel
 		petName = tabName
 		petMaxLevel = petMaxLevel(tabName)
 		petRarity = rarityFrom(petLine)
 		petActive = true
-		lines.firstNotNullOfOrNull { tabXpPattern.find(it.string)?.groupValues?.getOrNull(1)?.toFloatOrNull() }?.let {
+		val progress = tabXpPattern.find(petLine.string)?.groupValues?.getOrNull(1)?.toFloatOrNull()
+			?: lines.firstNotNullOfOrNull { tabXpPattern.find(it.string)?.groupValues?.getOrNull(1)?.toFloatOrNull() }
+		progress?.let {
 			petXp = (it / 100.0f).coerceIn(0.0f, 1.0f)
 		}
 		setPetByName(tabName, petRarity)
@@ -279,8 +298,8 @@ object SkyblockDataTracker {
 	private fun setPetFromStack(stack: ItemStack) {
 		petItem = stack.copy()
 		val name = stack.customName?.string.orEmpty()
-		petNamePattern.find(name)?.let { match ->
-			petLevel = match.groupValues[1].toIntOrNull() ?: petLevel
+		petStackNamePattern.find(name)?.let { match ->
+			petLevel = match.groupValues[1].replace(",", "").toIntOrNull() ?: petLevel
 			petName = normalizePetName(match.groupValues[2])
 		}
 		petMaxLevel = petMaxLevel(petName)
@@ -345,7 +364,9 @@ object SkyblockDataTracker {
 
 	private fun normalizePetName(value: String): String {
 		return value
-			.replace(Regex("""\[Lvl\s+\d+(?:\s*->\s*\d+)?]\s*"""), "")
+			.replace(Regex("""\[Lvl\s+[\d,]+(?:\s*->\s*[\d,]+)?]\s*"""), "")
+			.replace(Regex("""^\[[\d,]+✦]\s*"""), "")
+			.replace(Regex("""\s+\([\d.]+%\)\s*$"""), "")
 			.replace("\u2726", "")
 			.replace("\u2B50", "")
 			.trim()

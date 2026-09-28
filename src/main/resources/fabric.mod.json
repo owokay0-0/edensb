@@ -4,7 +4,7 @@
 	"version": "${version}",
 	"name": "Eden",
 	"icon": "icon.png",
-	"description": "A client-side Hypixel SkyBlock utility mod with dungeon helpers, HUD overlays, visual customization, render fixes, reminders, tooltip improvements.",
+	"description": "A client-side Hypixel SkyBlock utility mod with dungeon helpers, HUD overlays, visual customization, render fixes, and tooltip improvements.",
 	"authors": [
 		"owokay"
 	],
@@ -26,8 +26,8 @@
   ],
 	"accessWidener": "eden.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.19.2",
-		"minecraft": "~26.1.2",
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
 		"java": ">=25",
 		"fabric-api": "*"
 	}

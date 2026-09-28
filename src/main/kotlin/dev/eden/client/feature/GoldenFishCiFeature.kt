@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.component.SwingAnimation
 
 object GoldenFishCiFeature {
 	fun register() {
@@ -27,7 +28,7 @@ object GoldenFishCiFeature {
 			val useHand = rodHand(player, hand) ?: hand
 			val result = client.gameMode?.useItem(player, useHand) ?: InteractionResult.PASS
 			if (result.consumesAction()) {
-				player.swing(useHand)
+				player.swing(useHand, SwingAnimation.DEFAULT, false)
 			}
 			InteractionResult.FAIL
 		}

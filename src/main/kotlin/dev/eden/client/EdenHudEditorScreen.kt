@@ -28,9 +28,9 @@ class EdenHudEditorScreen(
 		val centerX = width / 2
 		val centerY = height / 2
 		val line = font.lineHeight + 3
-		graphics.centeredText(font, "Left-click and drag the highlighted element.", centerX, centerY - line * 4, 0xFFFFFFFF.toInt())
-		graphics.centeredText(font, "Right or middle-click it to reset.", centerX, centerY - line * 3, 0xFFD0CEDA.toInt())
-		graphics.centeredText(font, "Scroll to scale. Press A/D to switch elements.", centerX, centerY - line * 2, 0xFFD0CEDA.toInt())
+		graphics.centeredText(font, "Every editable HUD is shown. Click and drag any HUD.", centerX, centerY - line * 4, 0xFFFFFFFF.toInt())
+		graphics.centeredText(font, "Right or middle-click a HUD to reset it.", centerX, centerY - line * 3, 0xFFD0CEDA.toInt())
+		graphics.centeredText(font, "Hover and scroll to scale. A/D also switches selection.", centerX, centerY - line * 2, 0xFFD0CEDA.toInt())
 		graphics.centeredText(font, "Currently changing: ${selected.displayName}", centerX, centerY, 0xFFAAA4FF.toInt())
 		val (offsetX, offsetY) = SkyblockHudRenderer.currentOffset(selected)
 		val scale = SkyblockHudRenderer.currentScale(selected)
@@ -44,17 +44,16 @@ class EdenHudEditorScreen(
 	}
 
 	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
-		val bounds = SkyblockHudRenderer.bounds(selected, width, height)
-		if (!contains(bounds, event.x(), event.y())) {
-			return true
-		}
+		val clicked = widgetAt(event.x(), event.y()) ?: return true
+		selectedIndex = EdenHudWidget.entries.indexOf(clicked)
+		val bounds = SkyblockHudRenderer.bounds(clicked, width, height)
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			dragging = true
 			dragOffsetX = event.x().toFloat() - bounds.x
 			dragOffsetY = event.y().toFloat() - bounds.y
 		} else {
-			SkyblockHudRenderer.resetLayout(selected)
-			SkyblockHudRenderer.persistLayout(selected)
+			SkyblockHudRenderer.resetLayout(clicked)
+			SkyblockHudRenderer.persistLayout(clicked)
 		}
 		return true
 	}
@@ -82,6 +81,9 @@ class EdenHudEditorScreen(
 		horizontalAmount: Double,
 		verticalAmount: Double,
 	): Boolean {
+		widgetAt(mouseX, mouseY)?.let { hovered ->
+			selectedIndex = EdenHudWidget.entries.indexOf(hovered)
+		}
 		val current = SkyblockHudRenderer.currentScale(selected)
 		val next = (current + verticalAmount.toFloat() * 0.05f).coerceIn(0.5f, 2.0f)
 		val (x, y) = SkyblockHudRenderer.currentOffset(selected)
@@ -115,7 +117,7 @@ class EdenHudEditorScreen(
 		for (widget in EdenHudWidget.entries) {
 			SkyblockHudRenderer.persistLayout(widget)
 		}
-		minecraft.setScreen(parent)
+		minecraft.gui.setScreen(parent)
 	}
 
 	override fun isPauseScreen(): Boolean = false
@@ -132,6 +134,13 @@ class EdenHudEditorScreen(
 
 	private fun contains(bounds: SkyblockHudRenderer.Bounds, x: Double, y: Double): Boolean {
 		return x >= bounds.x && x <= bounds.x + bounds.width && y >= bounds.y && y <= bounds.y + bounds.height
+	}
+
+	private fun widgetAt(x: Double, y: Double): EdenHudWidget? {
+		if (contains(SkyblockHudRenderer.bounds(selected, width, height), x, y)) return selected
+		return EdenHudWidget.entries.asReversed().firstOrNull { widget ->
+			contains(SkyblockHudRenderer.bounds(widget, width, height), x, y)
+		}
 	}
 
 	private fun drawHotbarPlaceholder(graphics: GuiGraphicsExtractor) {

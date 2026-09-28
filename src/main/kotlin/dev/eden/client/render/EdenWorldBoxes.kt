@@ -2,7 +2,7 @@ package dev.eden.client.render
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.world.phys.AABB
 
@@ -15,7 +15,7 @@ object EdenWorldBoxes {
 
 	fun draw(
 		poseStack: PoseStack,
-		bufferSource: MultiBufferSource.BufferSource,
+		submitNodeCollector: SubmitNodeCollector,
 		box: AABB,
 		color: Int,
 		style: Int,
@@ -27,28 +27,23 @@ object EdenWorldBoxes {
 		val drawOutline = style == STYLE_OUTLINE || style == STYLE_FILLED_OUTLINE
 
 		if (drawFilled) {
-			drawFilledBox(poseStack, bufferSource, filledType, box, color)
+			submitNodeCollector.submitCustomGeometry(poseStack, filledType) { pose, buffer ->
+				drawFilledBox(pose, buffer, box, color)
+			}
 		}
 		if (drawOutline) {
-			drawLineBox(poseStack, bufferSource, lineType, box, outlineColor(color))
-		}
-		if (drawFilled) {
-			bufferSource.endBatch(filledType)
-		}
-		if (drawOutline) {
-			bufferSource.endBatch(lineType)
+			submitNodeCollector.submitCustomGeometry(poseStack, lineType) { pose, buffer ->
+				drawLineBox(pose, buffer, box, outlineColor(color))
+			}
 		}
 	}
 
 	private fun drawFilledBox(
-		poseStack: PoseStack,
-		bufferSource: MultiBufferSource,
-		renderType: RenderType,
+		pose: PoseStack.Pose,
+		buffer: VertexConsumer,
 		box: AABB,
 		color: Int,
 	) {
-		val pose = poseStack.last()
-		val buffer = bufferSource.getBuffer(renderType)
 		val r = ((color ushr 16) and 0xFF) / 255.0f
 		val g = ((color ushr 8) and 0xFF) / 255.0f
 		val b = (color and 0xFF) / 255.0f
@@ -57,14 +52,11 @@ object EdenWorldBoxes {
 	}
 
 	private fun drawLineBox(
-		poseStack: PoseStack,
-		bufferSource: MultiBufferSource,
-		renderType: RenderType,
+		pose: PoseStack.Pose,
+		buffer: VertexConsumer,
 		box: AABB,
 		color: Int,
 	) {
-		val pose = poseStack.last()
-		val buffer = bufferSource.getBuffer(renderType)
 		val r = ((color ushr 16) and 0xFF) / 255.0f
 		val g = ((color ushr 8) and 0xFF) / 255.0f
 		val b = (color and 0xFF) / 255.0f

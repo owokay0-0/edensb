@@ -16,8 +16,12 @@ object PerformanceMetricsFeature {
 		private set
 
 	private val pingSamples = ArrayDeque<Int>()
+	private val fpsSamples = ArrayDeque<Float>()
+	private val tpsGraphSamples = ArrayDeque<Float>()
+	private val pingGraphSamples = ArrayDeque<Float>()
 	private var previousTimePacketAt = 0L
 	private var nextPingSampleAt = 0L
+	private var lastFrameAt = 0L
 
 	fun register() {
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
@@ -33,11 +37,31 @@ object PerformanceMetricsFeature {
 		val now = System.currentTimeMillis()
 		if (previousTimePacketAt != 0L) {
 			averageTps = (20_000.0f / (now - previousTimePacketAt + 1L)).coerceIn(0.0f, 20.0f)
+			tpsGraphSamples.addLast(averageTps)
+			while (tpsGraphSamples.size > 90) tpsGraphSamples.removeFirst()
 		}
 		previousTimePacketAt = now
 	}
 
 	fun fps(): Int = Minecraft.getInstance().fps
+
+	fun recordFrame() {
+		val now = System.nanoTime()
+		if (lastFrameAt != 0L) {
+			val frameMs = (now - lastFrameAt) / 1_000_000.0f
+			if (frameMs in 1.0f..500.0f) {
+				fpsSamples.addLast((1_000.0f / frameMs).coerceIn(0.0f, 240.0f))
+				while (fpsSamples.size > 90) fpsSamples.removeFirst()
+			}
+		}
+		lastFrameAt = now
+	}
+
+	fun fpsHistory(): List<Float> = fpsSamples.toList()
+
+	fun tpsHistory(): List<Float> = tpsGraphSamples.toList()
+
+	fun pingHistory(): List<Float> = pingGraphSamples.toList()
 
 	private fun samplePing(client: Minecraft) {
 		val now = System.currentTimeMillis()
@@ -53,6 +77,8 @@ object PerformanceMetricsFeature {
 			pingSamples.removeFirst()
 		}
 		averagePing = pingSamples.average().roundToInt()
+		pingGraphSamples.addLast(averagePing.toFloat())
+		while (pingGraphSamples.size > 90) pingGraphSamples.removeFirst()
 	}
 
 	private fun reset() {
@@ -61,5 +87,9 @@ object PerformanceMetricsFeature {
 		previousTimePacketAt = 0L
 		nextPingSampleAt = 0L
 		pingSamples.clear()
+		fpsSamples.clear()
+		tpsGraphSamples.clear()
+		pingGraphSamples.clear()
+		lastFrameAt = 0L
 	}
 }
